@@ -3,6 +3,7 @@ import Departure from '../../models/departure.entity'
 import Arrival from '../../models/arrival.entity'
 import User from '../../models/user.entity'
 import Machine from '../../models/machine.entity'
+import { IsNull, Not } from 'typeorm'
 
 export default class DepartureController {
     static async store(req: Request, res: Response){
@@ -62,11 +63,7 @@ export default class DepartureController {
     }
 
     static async show (req: Request, res: Response){
-        const { id } = req.params 
         const { userId } = req.headers
-
-        if (!id || isNaN(Number(id))) 
-	        return res.status(400).json({erro: 'O id da saída é obrigatório'})
 
         if (!userId) return res.status(401).json({ error: 'Usuário não autenticado' })
         
@@ -76,7 +73,7 @@ export default class DepartureController {
           return res.status(403).json({erro: 'Você não possui permissão de acesso'})
         }        
 
-        const departure = await Departure.findOneBy({id: Number(id)}) 
+        const departure = await Departure.find({where: { address: Not("null") }}) 
         if (!departure) 
 	        return res.status(404)
 
